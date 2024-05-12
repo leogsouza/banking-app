@@ -3,10 +3,10 @@ import { Inter, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
-const ibmPlexSefif = IBM_Plex_Serif({
+const ibmPlexSerif = IBM_Plex_Serif({
   subsets: ['latin'],
   weight: ['400', '700'],
-  variable: '--font-ibm-plex-sefi'
+  variable: '--font-ibm-plex-serif'
 })
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${ibmPlexSefif.className}`}>{children}</body>
+      <body className={`${inter.variable} ${ibmPlexSerif.variable}`}>{children}</body>
     </html>
   );
 }
