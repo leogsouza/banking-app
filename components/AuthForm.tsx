@@ -8,21 +8,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormDescription,
-  FormMessage,
+  Form
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import CustomInput from "./CustomInput";
 import { Loader2 } from "lucide-react";
 import { authFormSchema } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/actions/user.actions";
+import { signIn, signUp } from "@/lib/actions/user.actions";
 
 const AuthForm = ({ type }: { type: string }) => {
   const [user, setUser] = useState(null);
