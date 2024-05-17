@@ -6,15 +6,22 @@ import { ID } from "node-appwrite"
 import { cookies } from "next/headers"
 import { parseStringify } from "../utils"
 
-export const signIn = async (data: LoginUser) => {
+export const signIn = async ({email, password}: LoginUser) => {
   try {
-    
+    const { account } = await createAdminClient()
+
+    const response = await account.createEmailPasswordSession(email, password)
+
+    return parseStringify(response)
+
   } catch (error) {
     console.log(error)
   }
 }
 
 export const signUp = async (userData: SignUpParams) => {
+  const loggedInUser = await getLoggedInUser();
+  console.log(loggedInUser)
   try {
     const {email, password, firstName, lastName} = userData
 
@@ -40,7 +47,9 @@ export const signUp = async (userData: SignUpParams) => {
 export async function getLoggedInUser() {
   try {
     const {account } = await createSessionClient()
-    return await account.get()
+    const user =  await account.get()
+    console.log('user', user)
+    return parseStringify(user)
   } catch (error) {
     return null
   }
