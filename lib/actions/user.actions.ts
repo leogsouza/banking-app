@@ -11,6 +11,12 @@ export const signIn = async ({email, password}: LoginUser) => {
     const { account } = await createAdminClient()
 
     const response = await account.createEmailPasswordSession(email, password)
+    cookies().set('appwrite-bank-session', response.secret, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+    })
 
     return parseStringify(response)
 
@@ -20,8 +26,7 @@ export const signIn = async ({email, password}: LoginUser) => {
 }
 
 export const signUp = async (userData: SignUpParams) => {
-  const loggedInUser = await getLoggedInUser();
-  console.log(loggedInUser)
+  
   try {
     const {email, password, firstName, lastName} = userData
 
@@ -30,7 +35,9 @@ export const signUp = async (userData: SignUpParams) => {
     const newUser = await account.create(ID.unique(), email, password, `${firstName} ${lastName}`)
     const session = await account.createEmailPasswordSession(email, password)
 
-    cookies().set('bank-session', session.secret, {
+    
+
+    cookies().set('appwrite-bank-session', session.secret, {
       path: '/',
       httpOnly: true,
       sameSite: 'strict',
@@ -48,8 +55,19 @@ export async function getLoggedInUser() {
   try {
     const {account } = await createSessionClient()
     const user =  await account.get()
-    console.log('user', user)
     return parseStringify(user)
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function logoutAccount() {
+  try {
+    const { account } = await createSessionClient()
+
+    cookies().delete('appwrite-bank-session');
+    await account.deleteSession('current')
   } catch (error) {
     return null
   }
