@@ -3,12 +3,15 @@
 import {
   createBankAccountProps,
   exchangePublicTokenProps,
+  getBankProps,
+  getBanksProps,
+  getUserInfoProps,
   LoginUser,
   SignUpParams,
   User,
 } from "@/types";
 import { createAdminClient, createSessionClient } from "../server/appwrite";
-import { ID } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { cookies } from "next/headers";
 import { encryptId, extractCustomerIdFromUrl, parseStringify } from "../utils";
 import {
@@ -26,6 +29,21 @@ const {
   APPWRITE_USER_COLLECTION_ID: USER_COLLECTION_ID,
   APPWRITE_BANK_COLLECTION_ID: BANK_COLLECTION_ID,
 } = process.env;
+
+export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+  try {
+    const { database } = await createAdminClient()
+
+    const user = await database.listDocuments(
+      DATABASE_ID!, 
+      USER_COLLECTION_ID!, 
+      [Query.equal('userId', [userId])])
+
+    return parseStringify(user.documents[0])
+  } catch (error) {
+    
+  }
+}
 
 export const signIn = async ({ email, password }: LoginUser) => {
   try {
@@ -101,7 +119,8 @@ export const signUp = async ({password, ...userData}: SignUpParams) => {
 export async function getLoggedInUser() {
   try {
     const { account } = await createSessionClient();
-    const user = await account.get();
+    const result = await account.get();
+    const user = await getUserInfo({ userId: result.$id})
     return parseStringify(user);
   } catch (error) {
     console.error(error);
@@ -146,7 +165,7 @@ export const createBankAccount = async ({
   accountId,
   accessToken,
   fundingSourceUrl,
-  sharableId,
+  shareableId,
 }: createBankAccountProps) => {
   try {
     const { database } = await createAdminClient();
@@ -161,7 +180,7 @@ export const createBankAccount = async ({
         accountId,
         accessToken,
         fundingSourceUrl,
-        sharableId,
+        shareableId,
       }
     );
 
@@ -209,6 +228,8 @@ export const exchangePublicToken = async ({
 
     if (!fundingSourceUrl) throw Error;
 
+    console.log('userId', user.$id)
+    console.log('itemId', itemId)
     // Crate a bank account using the user ID, item ID, account ID, access token, funding source URL, and sharable ID
     await createBankAccount({
       userId: user.$id,
@@ -216,7 +237,7 @@ export const exchangePublicToken = async ({
       accountId: accountData.account_id,
       accessToken,
       fundingSourceUrl,
-      sharableId: encryptId(accountData.account_id),
+      shareableId: encryptId(accountData.account_id),
     });
 
     revalidatePath("/");
@@ -228,3 +249,40 @@ export const exchangePublicToken = async ({
     console.error("An error occurred while creating exchange token:", error);
   }
 };
+
+
+// get banks accounts from a specific user
+export const getBanks = async ({ userId }: getBanksProps) => {
+  try {
+    const { database } = await createAdminClient()
+
+    const banks = await database.listDocuments(DATABASE_ID!, BANK_COLLECTION_ID!, [Query.equal("userId", [userId])])
+    return parseStringify(banks.documents)
+  } catch (error) {
+    console.error("Error on getting banks:", error)
+    return null
+  }
+}
+
+export const getBank = async ({ documentId }: getBankProps) => {
+  try {
+  const { database } = await createAdminClient()
+
+  console.log('documentId', documentId)
+  const bank = await database.listDocuments(
+    DATABASE_ID!, 
+    BANK_COLLECTION_ID!, 
+    [Query.equal('$id', [documentId])])
+  
+  console.log('bank get bank', bank)
+  
+
+  if (bank.total !== 1) return null
+
+  return parseStringify(bank.documents[0])
+  } catch(error) {
+    console.error("Error on getting a bank:", error)
+    return null
+  }
+
+}

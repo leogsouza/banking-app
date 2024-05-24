@@ -28,7 +28,7 @@ export const createFundingSource = async (
 ) => {
   try {
     return await dwollaClient
-      .post(`customers/${options.customerId}/funding-services`, {
+      .post(`customers/${options.customerId}/funding-sources`, {
         name: options.fundingSourceName,
         plaidToken: options.plaidToken,
       })
