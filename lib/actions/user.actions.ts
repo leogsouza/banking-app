@@ -45,12 +45,12 @@ export const signIn = async ({ email, password }: LoginUser) => {
   }
 };
 
-export const signUp = async (userData: SignUpParams) => {
+export const signUp = async ({password, ...userData}: SignUpParams) => {
 
   let newUserAccount;
 
   try {
-    const { email, password, firstName, lastName } = userData;
+    const { email, firstName, lastName } = userData;
 
     const { account, database } = await createAdminClient();
 
@@ -72,8 +72,6 @@ export const signUp = async (userData: SignUpParams) => {
     
     const dwollaCustomerId = extractCustomerIdFromUrl(dwollaCustomerUrl)
 
-    const session = await account.createEmailPasswordSession(email, password);
-
     const newUser = await database.createDocument(DATABASE_ID!, USER_COLLECTION_ID!,
       ID.unique(),
       {
@@ -83,6 +81,9 @@ export const signUp = async (userData: SignUpParams) => {
         dwollaCustomerUrl
       }
     )
+
+    const session = await account.createEmailPasswordSession(email, password);
+    
 
     cookies().set("appwrite-bank-session", session.secret, {
       path: "/",
@@ -125,7 +126,7 @@ export const createLinkToken = async (user: User) => {
       user: {
         client_user_id: user.$id,
       },
-      client_name: user.name,
+      client_name: `${user.firstName} ${user.lastName}`,
       products: ["auth"] as Products[],
       language: "en",
       country_codes: ["US"] as CountryCode[],
