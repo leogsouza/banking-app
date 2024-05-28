@@ -25,7 +25,7 @@ const RecentTransactions = ({
       <Tabs defaultValue={appwriteItemId} className='w-full'>
         <TabsList className="recent-transactions-tablist">
           {accounts.map((account: Account) => (
-            <TabsTrigger key={account.id} value={account.appwriteItemId}>
+            <TabsTrigger key={account.id} value={account.appwriteId}>
               <BankTabItem
                 key={account.id}
                 account={account}
@@ -36,7 +36,7 @@ const RecentTransactions = ({
         </TabsList>
         {accounts.map((account: Account) => (
           <TabsContent
-          value={account.appwriteItemId}
+          value={account.appwriteId}
           key={account.id}
           className='space-y-4'
           >
@@ -47,9 +47,7 @@ const RecentTransactions = ({
             />
             <TransactionsTable transactions={transactions} />
           </TabsContent>
-        ))}
-        <TabsContent value='account'>Make changes to your account here.</TabsContent>
-        <TabsContent value='password'>Change your password here.</TabsContent>
+        ))}        
       </Tabs>
     </section>
   )

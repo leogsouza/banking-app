@@ -61,7 +61,7 @@ declare type Account = {
   name: string;
   type: string;
   subtype: string;
-  appwriteItemId: string;
+  appwriteId: string;
   shareableId: string;
 };
 
