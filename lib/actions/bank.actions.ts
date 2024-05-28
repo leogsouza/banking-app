@@ -56,8 +56,8 @@ export const getAccount = async({ appwriteItemId}: getAccountProps) => {
     const transferTransactionsData = await getTransactionsByBankId({
       bankId: bank.$id,
     });
-    console.log('transfer data', transferTransactionsData)
-    const transferTransactions = transferTransactionsData.documents.map(
+    
+    const transferTransactions = transferTransactionsData?.documents.map(
       (transferData: Transaction) => ({
         id: transferData.$id,
         name: transferData.name!,
