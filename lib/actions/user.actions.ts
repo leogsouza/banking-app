@@ -267,15 +267,11 @@ export const getBanks = async ({ userId }: getBanksProps) => {
 export const getBank = async ({ documentId }: getBankProps) => {
   try {
   const { database } = await createAdminClient()
-
-  console.log('documentId', documentId)
+    
   const bank = await database.listDocuments(
     DATABASE_ID!, 
     BANK_COLLECTION_ID!, 
-    [Query.equal('$id', [documentId])])
-  
-  console.log('bank get bank', bank)
-  
+    [Query.equal('$id', [documentId])])  
 
   if (bank.total !== 1) return null
 
